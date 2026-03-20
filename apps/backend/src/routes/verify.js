@@ -1,11 +1,18 @@
 import { prisma } from "../db.js"
 
 export default async function verifyRoutes(fastify) {
-  fastify.get('/verify', async (request, reply) => {
+  fastify.get('/verify', {
+    schema: {
+      querystring: {
+        type: 'object',
+        required: ['token'],
+        properties: {
+          token: { type: 'string' }
+        }
+      }
+    }
+  }, async (request, reply) => {
     const { token } = request.query
-
-    if (!token)
-      return reply.status(400).send({ error: 'Missing token' })
 
     try {
       const user = await prisma.user.findUnique({

@@ -1,5 +1,7 @@
 import Fastify from 'fastify'
 import AutoLoad from '@fastify/autoload'
+import swagger from '@fastify/swagger'
+import swaggerUI from '@fastify/swagger-ui'
 import { join } from 'path'
 
 const fastify = Fastify({
@@ -29,6 +31,20 @@ fastify.setErrorHandler((error, request, reply) => {
   }
   reply.send(error);
 });
+
+await fastify.register(swagger, {
+  openapi: {
+    info: {
+      title: 'teszt',
+      description: 'teszt leírás',
+      version: '0.0.1'
+    }
+  }
+})
+
+await fastify.register(swaggerUI, {
+  routePrefix: '/api/docs'
+})
 
 fastify.register(AutoLoad, {
   dir: join(process.cwd(), 'src/routes'),
