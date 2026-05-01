@@ -60,7 +60,7 @@
         },
         "serve": {
           "options": {
-            "allowedHosts": ["campuslife.social", "www.campuslife.social", "localhost", "frontend"],
+            "allowedHosts": ["campuslife.social", "www.campuslife.social", "localhost", "frontend", "test.campuslife.social"],
             "proxyConfig": "proxy.conf.json"
           },
           "builder": "@angular/build:dev-server",

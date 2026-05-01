@@ -3,4 +3,4 @@ package-lock.json
 docker/ssl/*
 !docker/ssl/.gitkeep
 docker/postgres
-docker/postgres-prod
+.idea

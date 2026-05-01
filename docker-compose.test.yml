@@ -24,7 +24,6 @@ services:
       caddy.reverse_proxy_1: /api/* backend:3000
     networks:
       - caddy
-
   postgres:
     image: postgres:16
     environment:
@@ -37,7 +36,6 @@ services:
       - ./docker/postgres:/var/lib/postgresql/data
     networks:
       - caddy
-
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -52,7 +50,6 @@ services:
       caddy.reverse_proxy: "{{pgadmin:80}}"
     networks:
       - caddy
-
 volumes:
   backend_node_modules: {}
   frontend_node_modules: {}
@@ -60,3 +57,4 @@ volumes:
 networks:
   caddy:
     external: true
+    

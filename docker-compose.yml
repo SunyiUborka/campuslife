@@ -24,6 +24,8 @@ services:
 
   frontend:
     image: campuslife-frontend
+    env_file:
+      - .env
     volumes:
       - ./apps/frontend:/app
       - frontend_node_modules:/app/node_modules
@@ -32,23 +34,35 @@ services:
 
   postgres:
     image: postgres:16
+    user: "${PUID}:${PGID}"
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-    ports:
-      - ${POSTGRES_PORT}:5432
+      POSTGRES_DB: campuslife
     volumes:
       - ./docker/postgres:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT}:5432
   pgadmin:
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@campuslife.social
-      PGADMIN_DEFAULT_PASSWORD: 0G24czxjD1RS3zNy
+      PGADMIN_DEFAULT_PASSWORD: CampusL1fe
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGADMIN_SERVER_JSON_FILE: /var/lib/pgadmin/servers.json
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - ./docker/pgadmin/setup.sh:/pgadmin4/setup.sh:ro
+      - pgadmin_data:/var/lib/pgadmin
+    entrypoint: ["/bin/sh", "/pgadmin4/setup.sh"]
     ports:
-      - 5050:80
+      - 5051:80
     depends_on:
       - postgres
 volumes:
-  backend_node_modules: {}
-  frontend_node_modules: {}
+  backend_node_modules:
+  frontend_node_modules:
+  pgadmin_data:
