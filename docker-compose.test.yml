@@ -1,0 +1,62 @@
+services:
+  backend:
+    image: campuslife-backend
+    env_file:
+      - .env.test
+    volumes:
+      - ./apps/backend:/app
+      - backend_node_modules:/app/node_modules
+    ports:
+      - ${BACKEND_PORT}:3000
+    networks:
+      - caddy
+
+  frontend:
+    image: campuslife-frontend
+    volumes:
+      - ./apps/frontend:/app
+      - frontend_node_modules:/app/node_modules
+    ports:
+      - ${FRONTEND_PORT}:4200
+    labels:
+      caddy: test.campuslife.social
+      caddy.reverse_proxy: "{{upstreams 4200}}"
+      caddy.reverse_proxy_1: /api/* backend:3000
+    networks:
+      - caddy
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
+    networks:
+      - caddy
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@campuslife.social
+      PGADMIN_DEFAULT_PASSWORD: 0G24czxjD1RS3zNy
+    ports:
+      - 5051:80
+    depends_on:
+      - postgres
+    labels:
+      caddy: pg-test.campuslife.social
+      caddy.reverse_proxy: "{{pgadmin:80}}"
+    networks:
+      - caddy
+
+volumes:
+  backend_node_modules: {}
+  frontend_node_modules: {}
+
+networks:
+  caddy:
+    external: true
