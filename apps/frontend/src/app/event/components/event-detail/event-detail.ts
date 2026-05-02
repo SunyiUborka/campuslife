@@ -1,9 +1,10 @@
 import { AsyncPipe, CommonModule, DatePipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventService } from '../../services/event-service';
 import { CampusEvent } from '../../interfaces/event';
 import { BehaviorSubject, finalize, map, Observable } from 'rxjs';
+import { Auth } from '../../../auth/services/auth';
 
 @Component({
   selector: 'app-event-detail',
@@ -14,13 +15,16 @@ import { BehaviorSubject, finalize, map, Observable } from 'rxjs';
 })
 export class EventDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly eventService = inject(EventService);
+  readonly auth = inject(Auth);
 
   private readonly eventSubject = new BehaviorSubject<CampusEvent | undefined>(undefined);
   selectedEvent$: Observable<CampusEvent | undefined> = this.eventSubject.asObservable();
 
   private readonly loadingSubject = new BehaviorSubject<boolean>(true);
   isLoading$: Observable<boolean> = this.loadingSubject.asObservable();
+  isDeleting = false;
 
   hasUserRsvped$: Observable<boolean> = this.selectedEvent$.pipe(map(e => !!e?.hasUserRsvped));
   isPastEvent$: Observable<boolean> = this.selectedEvent$.pipe(map(e => e ? new Date(e.startsAt).getTime() < Date.now() : false));
@@ -85,5 +89,35 @@ export class EventDetail implements OnInit {
         alert('Hiba történt a jelentkezés lemondásakor');
       }
     });
+  }
+
+  onDeleteEvent(): void {
+    const event = this.eventSubject.value;
+
+    if (!event || !this.isCreator(event) || this.isDeleting) {
+      return;
+    }
+
+    if (!globalThis.confirm('Delete this event? This action cannot be undone.')) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.eventService.deleteEvent(event.id).subscribe({
+      next: () => {
+        this.isDeleting = false;
+        void this.router.navigate(['/events/my']);
+      },
+      error: (err) => {
+        this.isDeleting = false;
+        console.error('Delete event failed', err);
+        alert(err?.error?.error || 'Failed to delete event');
+      }
+    });
+  }
+
+  isCreator(event: CampusEvent): boolean {
+    const currentUserId = Number(this.auth.currentUser()?.id);
+    return Number.isInteger(currentUserId) && event.hostId === currentUserId;
   }
 }

@@ -159,6 +159,10 @@
   transition: all 0.2s ease;
 }
 
+a.rsvp-button {
+  text-decoration: none;
+}
+
 .rsvp-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -171,6 +175,31 @@
 
 .rsvp-button.cancel:hover {
   background: #8a2424;
+}
+
+.rsvp-button.manage {
+  background: #1e5a97;
+  border-color: #cde4ff;
+}
+
+.rsvp-button.manage:hover {
+  background: #194b7d;
+}
+
+.rsvp-button.delete {
+  background: #aa2e2e;
+  border-color: #ffd1d1;
+}
+
+.rsvp-button.delete:hover {
+  background: #8a2424;
+}
+
+.rsvp-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .rsvp-status,

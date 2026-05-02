@@ -42,6 +42,21 @@
       </div>
 
       <div class="action-row">
+        <ng-container *ngIf="isCreator(selectedEvent)">
+          <a class="rsvp-button manage" [routerLink]="['/events', selectedEvent.id, 'edit']">
+            Edit Event
+          </a>
+
+          <button
+            type="button"
+            class="rsvp-button delete"
+            [disabled]="isDeleting"
+            (click)="onDeleteEvent()"
+          >
+            {{ isDeleting ? 'Deleting...' : 'Delete Event' }}
+          </button>
+        </ng-container>
+
         <button
           *ngIf="!(isPastEvent$ | async) && !(hasUserRsvped$ | async)"
           type="button"
